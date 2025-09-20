@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Selling App</title>
+<style>
+  body {
+    margin: 0; padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+  }
+  .splash {
+    display: flex; justify-content: center; align-items: center;
+    height: 100vh; background: #ff7043;
+    color: white; font-size: 24px; font-weight: bold;
+    text-align: center;
+  }
+  .hidden { display: none; }
+  header {
+    background: #ff7043; color: white;
+    padding: 20px; text-align: center; font-weight: bold;
+  }
+  nav { display: flex; }
+  nav button {
+    flex: 1; padding: 15px; border: none;
+    cursor: pointer; background: #333; color: white;
+  }
+  nav button:hover { background: #555; }
+  .container {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+    gap: 20px; padding: 20px;
+  }
+  .card {
+    background: white; border-radius: 12px;
+    padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  .card img { width: 100%; border-radius: 12px; }
+  .card h3 { margin: 10px 0 5px; }
+  .card button {
+    background: #ff7043; border: none;
+    color: white; padding: 10px; width: 100%;
+    border-radius: 8px; cursor: pointer;
+  }
+  .card button:hover { background: #e64a19; }
+  .history { padding: 20px; }
+  .history table { width: 100%; border-collapse: collapse; }
+  .history th, .history td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+  .history th { background: #ff7043; color: white; }
+</style>
+</head>
+<body>
+ 
+<div id="splash" class="splash hidden">
+  Welcome, Htay Lin Aung (ID: 240702401954)
+</div>
+ 
+<div id="mainApp" class="hidden">
+  <header>🍔 Food App - Htay Lin Aung (ID: 240702401954)</header>
+  <nav>
+    <button onclick="showPage('menuPage')">Menu</button>
+    <button onclick="showPage('historyPage')">Order History</button>
+  </nav>
+ 
+  <div id="menuPage" class="container"></div>
+ 
+  <div id="historyPage" class="history hidden">
+    <h2>Order History</h2>
+    <table>
+      <thead>
+        <tr><th>Food</th><th>Price</th><th>Date & Time</th></tr>
+      </thead>
+      <tbody id="historyItems"></tbody>
+    </table>
+  </div>
+</div>
+ 
+<script>
+  const foods = [
+    { name: "Burger", price: 5, img: "./pictures/burger.png" },
+    { name: "Pizza", price: 8, img: "./pictures/pizza.png" },
+    { name: "Noodles", price: 4, img: "./pictures/noodle.png" },
+    { name: "Fried Rice", price: 6, img: "./pictures/friedrice.png" }
+  ];
+ 
+  const splash = document.getElementById("splash");
+  const mainApp = document.getElementById("mainApp");
+  const menuDiv = document.getElementById("menuPage");
+  const historyDiv = document.getElementById("historyItems");
+ 
+  let history = JSON.parse(localStorage.getItem("orderHistory")) || [];
+ 
+  function renderMenu() {
+    menuDiv.innerHTML = "";
+    foods.forEach(food => {
+      menuDiv.innerHTML += `
+        <div class="card">
+          <img src="${food.img}" alt="${food.name}">
+          <h3>${food.name}</h3>
+          <p>Price: $${food.price}</p>
+          <button onclick="orderFood('${food.name}', ${food.price})">Order Now</button>
+        </div>
+      `;
+    });
+  }
+ 
+  function orderFood(name, price) {
+    const time = new Date().toLocaleString();
+    history.push({ name, price, time });
+    localStorage.setItem("orderHistory", JSON.stringify(history));
+    alert(`You ordered: ${name} - $${price}`);
+    renderHistory();
+  }
+ 
+  function renderHistory() {
+    historyDiv.innerHTML = "";
+    history.forEach(item => {
+      historyDiv.innerHTML += `
+        <tr>
+          <td>${item.name}</td>
+          <td>$${item.price}</td>
+          <td>${item.time}</td>
+        </tr>
+      `;
+    });
+  }
+ 
+  function showPage(pageId) {
+    document.getElementById("menuPage").classList.add("hidden");
+    document.getElementById("historyPage").classList.add("hidden");
+    document.getElementById(pageId).classList.remove("hidden");
+  }
+ 
+  if (!localStorage.getItem("visited")) {
+    splash.classList.remove("hidden");
+    setTimeout(() => {
+      splash.classList.add("hidden");
+      mainApp.classList.remove("hidden");
+      renderMenu();
+      renderHistory();
+      localStorage.setItem("visited", "true");
+    }, 2000);
+  } else {
+    mainApp.classList.remove("hidden");
+    renderMenu();
+    renderHistory();
+  }
+</script>
+ 
+</body>
+</html>
+ 
